@@ -1,0 +1,37 @@
+# Per-repo Sciantist defaults. CLI flags override these values.
+target_repo: /path/to/your/ml-project/
+start_out_branch: main
+branch: sciantist/loop
+output_dir: ./outputs/sciantist/
+wandb_project: your-wandb-project
+wandb_entity: your-wandb-entity
+metric_weights:
+  val/image_to_text_recall@10: 0.2
+  val/text_to_image_recall@10: 0.2
+  val/image_to_text_recall@5: 0.2
+  val/text_to_image_recall@5: 0.2
+  val/image_to_text_recall@1: 0.2
+  val/text_to_image_recall@1: 0.2
+metric_higher_is_better: true
+start_out_metric_baseline: 0.15
+user_prompt_file: ./config/user_prompt.md
+init_cache_summary_file: ./outputs/sciantist/file_summary_cache.json
+allowed_file_suffixes:
+  - ".py"
+  - ".yaml"
+  - ".yml"
+deny_patterns:
+  - "(^|/)\\.venv(/|$)"
+  - "(^|/)n\\.aider(/|$)"
+  - "(^|/)aider(/|$)"
+  - "(^|/)outputs(/|$)"
+  - "(^|/)wandb(/|$)"
+  - "(^|/)eval(/|$)"
+  - "(^|/)evaluation(/|$)"
+  - "(^|/)validation(/|$)"
+aider_only_patterns:
+  - "(^|/)tests?(/|$)"
+cluster_target: cluster-a
+# cluster_extra_args: "-q gpu-pro -m gpu-a100-40gb -o logs/%J.out -e logs/%J.err"
+train_command: /path/to/ml-project/scripts/launch_slurm.sh wandb.project=your-wandb-project
+runtime: "08:30:00"

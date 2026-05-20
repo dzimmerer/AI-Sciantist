@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sciantist - Experiment Tracking Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">Sciantist</div>
+        <div class="nav-links">
+            <a href="#overview" class="nav-link active" data-section="overview">Overview</a>
+            <a href="#leaderboard" class="nav-link" data-section="leaderboard">Leaderboard</a>
+            <a href="#experiments" class="nav-link" data-section="experiments">Experiments</a>
+            <a href="#workers" class="nav-link" data-section="workers">Workers</a>
+            <a href="#output" class="nav-link" data-section="output">Output</a>
+        </div>
+        <div class="nav-output-dir">{{ output_dir }}</div>
+    </nav>
+
+    <main class="container">
+        <section id="overview" class="section active">
+            <h1>Project Overview</h1>
+            <div class="stats-grid" id="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-total-runs">-</div>
+                    <div class="stat-label">Total Runs</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-finished">-</div>
+                    <div class="stat-label">Finished</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-failed">-</div>
+                    <div class="stat-label">Failed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-running">-</div>
+                    <div class="stat-label">Running</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-best-metric">-</div>
+                    <div class="stat-label">Best Metric</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-avg-metric">-</div>
+                    <div class="stat-label">Avg Metric</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-workers">-</div>
+                    <div class="stat-label">Workers</div>
+                </div>
+            </div>
+
+            <div class="overview-panels">
+                <div class="panel">
+                    <h2>Recent Runs</h2>
+                    <div id="recent-runs" class="runs-list">
+                        <p class="loading">Loading...</p>
+                    </div>
+                </div>
+                <div class="panel">
+                    <h2>Top Performers</h2>
+                    <div id="top-performers" class="runs-list">
+                        <p class="loading">Loading...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel" id="memory-panel">
+                <div class="panel-header">
+                    <h2>Project Memory</h2>
+                    <button class="btn" id="expand-memory">Expand</button>
+                </div>
+                <div id="project-memory" class="memory-content">
+                    <p class="loading">Loading...</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="leaderboard" class="section">
+            <h1>Leaderboard</h1>
+            <div class="controls">
+                <div class="control-group">
+                    <label>Sort by:</label>
+                    <select id="leaderboard-sort">
+                        <option value="metric">Metric</option>
+                        <option value="runtime">Runtime</option>
+                        <option value="timestamp">Timestamp</option>
+                        <option value="worker">Worker</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Order:</label>
+                    <select id="leaderboard-order">
+                        <option value="desc">Descending</option>
+                        <option value="asc">Ascending</option>
+                    </select>
+                </div>
+                <button id="refresh-leaderboard" class="btn">Refresh</button>
+            </div>
+            <div class="table-container">
+                <table class="data-table" id="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Worker</th>
+                            <th>Run ID</th>
+                            <th>Idea Title</th>
+                            <th>Status</th>
+                            <th>Metric</th>
+                            <th>Runtime</th>
+                            <th>Timestamp</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-tbody">
+                        <tr><td colspan="9" class="loading">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="experiments" class="section">
+            <h1>Experiments</h1>
+            <div class="controls">
+                <div class="control-group">
+                    <label>Status:</label>
+                    <select id="exp-status-filter">
+                        <option value="all">All</option>
+                        <option value="finished">Finished</option>
+                        <option value="running">Running</option>
+                        <option value="pending">Pending</option>
+                        <option value="crashed">Crashed</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Worker:</label>
+                    <input type="text" id="exp-worker-filter" placeholder="Filter by worker...">
+                </div>
+                <button id="filter-experiments" class="btn">Apply Filters</button>
+            </div>
+            <div class="pagination" id="exp-pagination">
+                <button class="btn" id="exp-prev" disabled>Previous</button>
+                <span id="exp-page-info">Page 1 of 1</span>
+                <button class="btn" id="exp-next" disabled>Next</button>
+            </div>
+            <div class="table-container">
+                <table class="data-table" id="experiments-table">
+                    <thead>
+                        <tr>
+                            <th data-sort="run_id">Run ID</th>
+                            <th data-sort="worker_id">Worker</th>
+                            <th data-sort="idea_title">Idea Title</th>
+                            <th data-sort="status">Status</th>
+                            <th data-sort="unified_metric">Metric</th>
+                            <th data-sort="metric_delta">Delta</th>
+                            <th data-sort="runtime_seconds">Runtime</th>
+                            <th data-sort="job_id">Job ID</th>
+                            <th data-sort="kept">Kept</th>
+                            <th data-sort="timestamp_utc">Timestamp</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="experiments-tbody">
+                        <tr><td colspan="11" class="loading">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="workers" class="section">
+            <h1>Workers</h1>
+            <div class="workers-grid" id="workers-grid">
+                <p class="loading">Loading...</p>
+            </div>
+        </section>
+
+        <section id="output" class="section">
+            <h1>Global Output</h1>
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>output.log</h2>
+                    <button class="btn" id="refresh-output-log">Refresh</button>
+                </div>
+                <pre id="global-output-content" class="log-content"><p class="loading">Loading...</p></pre>
+            </div>
+        </section>
+
+        <section id="worker-detail" class="section">
+            <button class="btn back-btn" id="back-to-workers">&larr; Back to Workers</button>
+            <h1 id="worker-detail-title">Worker Details</h1>
+            <div class="worker-detail-panels">
+                <div class="panel">
+                    <h2>Worker Status</h2>
+                    <div id="worker-status" class="worker-status-content">
+                        <p class="loading">Loading...</p>
+                    </div>
+                </div>
+                <div class="panel">
+                    <h2>Worker Info</h2>
+                    <div id="worker-info" class="worker-status-content">
+                        <p class="loading">Loading...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="panel" id="worker-memory-panel">
+                <h2>Worker Memory</h2>
+                <div id="worker-memory" class="worker-memory-content">
+                    <p class="loading">Loading...</p>
+                </div>
+            </div>
+            <div class="panel">
+                <h2>Run History</h2>
+                <div class="table-container">
+                    <table class="data-table" id="worker-runs-table">
+                        <thead>
+                            <tr>
+                                <th>Run ID</th>
+                                <th>Idea Title</th>
+                                <th>Status</th>
+                                <th>Metric</th>
+                                <th>Runtime</th>
+                                <th>Timestamp</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="worker-runs-tbody">
+                            <tr><td colspan="7" class="loading">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="panel" id="worker-log-panel">
+                <h2>Worker Output Log</h2>
+                <button class="btn" id="load-worker-log-btn">Load Log</button>
+                <div id="worker-log-content" class="log-content" style="display: none;"></div>
+            </div>
+        </section>
+
+        <section id="run-detail" class="section">
+            <button class="btn back-btn" id="back-to-list">&larr; Back</button>
+            <h1 id="run-detail-title">Run Details</h1>
+            <div class="run-detail-content" id="run-detail-content">
+                <p class="loading">Loading...</p>
+            </div>
+        </section>
+    </main>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <span class="modal-close" id="modal-close">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

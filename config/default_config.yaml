@@ -1,0 +1,28 @@
+# Shared default settings loaded before repo-specific config.
+# Priority: CLI args > config/.scian.yaml > config/default_config.yaml > code constants.
+input_idea_path: ./config/intro.md
+experts_path: ./config/expert.md
+poll_seconds: 60
+fix_attempts: 10
+max_wandb_retries: 20
+openai_api_base: https://api.minimax.io/
+openai_api_key_env: MINIMAX_KEY
+openai_api_key: ""
+model_name: MiniMax-M2.7
+aider_model: openai/MiniMax-M2.7
+coder_backend: opencode
+max_summary_files: 20
+max_file_summary_chars: 12000
+include_file_summaries: true
+# ideas_per_stage: 7
+websearch_idea_prestep_enabled: true
+async_worker_mode: true
+async_worker_count: 10
+expert_worker_count: 9
+worker_restart_backoff_seconds: 5
+worker_heartbeat_seconds: 60
+worker_stale_timeout_seconds: 21600
+stop_before_secs: 6000
+cluster_runner_script: /home/user/scripts/run_on_cluster.sh
+lock_file_name: sciantist.lock
+leaderboard_json_name: leaderboard.json

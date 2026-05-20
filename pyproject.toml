@@ -1,0 +1,38 @@
+[project]
+name = "sciantist"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "aider-chat>=0.86.2",
+    "flask>=3.0.0",
+    "loguru>=0.7.2",
+    "mcp>=1.26.0",
+    "openai>=2.20.0",
+    "pandas>=2.3.3",
+    "pytest>=9.0.2",
+    "pyyaml>=6.0.2",
+    "wandb>=0.25.1",
+]
+
+[project.scripts]
+scian = "sciantist.cli:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.coverage.run]
+source = ["sciantist", "llmclient"]
+omit = [
+    "sciantist/aider_ops.py",
+    "sciantist/cli.py",
+    "sciantist/cluster_ops.py",
+    "sciantist/ideation.py",
+    "sciantist/repo_ops.py",
+    "sciantist/wandb_ops.py",
+    "scian.py",
+    "llmclient/main.py",
+    "llmclient/minimax_client.py",
+]

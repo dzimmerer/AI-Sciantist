@@ -1,0 +1,28 @@
+# Cluster catalog for Sciantist.
+# Select profile with --cluster-name, and load from --cluster-config (defaults to this file).
+clusters:
+  cluster-a:
+    cluster_target: cluster-a
+    ssh_target: user@cluster-a.example.edu
+    scheduler: slurm
+    wandb_sync: true
+    info_log_path: "$HOME/logs/{log_id}.out"
+    error_log_path: "$HOME/logs/{log_id}.err"
+    submit_extra_args: "--project your_project"
+
+  cluster-b:
+    cluster_target: cluster-b
+    ssh_target: user@cluster-b.example.edu
+    scheduler: slurm
+    wandb_sync: true
+    info_log_path: "$HOME/logs/{log_id}.out"
+    error_log_path: "$HOME/logs/{log_id}.err"
+
+  cluster-c:
+    cluster_target: cluster-c
+    ssh_target: user@cluster-c.example.edu
+    scheduler: lsf
+    wandb_sync: false
+    info_log_path: "$HOME/logs/{log_id}.out"
+    error_log_path: "$HOME/logs/{log_id}.err"
+    submit_extra_args: "--n_gpus 1 --gpu_mem 12G"
